@@ -10,22 +10,25 @@ function doGet(e) {
 //[auto, tele]
 // tele/auto: [[type, name, id, <options>], [type, name, id, <options>]]
 // Types: Plus/Minus:0 Checkbox:1 Slider:2 Dropdown:3 Text:4
-function getConfigData() {
-  // Example config
+// Example config
 //  var auto = [[0, "PM Ex", "pm1"],[3, "Selecty", "dd1", ["abc", "thing", "three"]]]
 //  var tele = [[1, "Check", "ck1"],[2, "Slid", "sl1", "40"]]
 //  var config = [auto, tele]
+function getConfigData() {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
+  // Get the data from the sheet
   var rawAutoData = getValues(spreadsheet, webpageConfig, 'B10', 'E60')
   var rawTeleDate = getValues(spreadsheet, webpageConfig, 'G10', 'J60')
-  
+  // Convert the data to the above format
   var autoData = parseRawData(rawAutoData)
   var teleData = parseRawData(rawTeleDate)
-  
   return [autoData, teleData]
 }
+
+// Turn data from the sheet into data that the webapp can understand
 function parseRawData(data) {
   var out = []
+  // Interate though the rows of the sheet
   for(var i = 0; i < data.length; i++) {
     var type = getTypeID(data[i][0])
     if(type == -1) { break; }
@@ -43,9 +46,10 @@ function parseRawData(data) {
   
   return out
 }
+
+// Returns the id of the type of widget and -1 if not valid
 function getTypeID(string) {
   string = string.toLowerCase()
-  
   if(string == "plus/minus") {
     return 0;
   } else if(string == "checkbox") {

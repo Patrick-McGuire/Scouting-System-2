@@ -12,11 +12,58 @@ function doGet(e) {
 // Types: Plus/Minus:0 Checkbox:1 Slider:2 Dropdown:3 Text:4
 function getConfigData() {
   // Example config
-  var auto = [[0, "PM Ex", "pm1"],[3, "Selecty", "dd1", ["abc", "thing", "three"]]]
-  var tele = [[1, "Check", "ck1"],[2, "Slid", "sl1", "40"]]
-  var config = [auto, tele]
+//  var auto = [[0, "PM Ex", "pm1"],[3, "Selecty", "dd1", ["abc", "thing", "three"]]]
+//  var tele = [[1, "Check", "ck1"],[2, "Slid", "sl1", "40"]]
+//  var config = [auto, tele]
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
+  var rawAutoData = getValues(spreadsheet, webpageConfig, 'B10', 'E60')
+  var rawTeleDate = getValues(spreadsheet, webpageConfig, 'G10', 'J60')
   
+  var autoData = parseRawData(rawAutoData)
+  var teleData = parseRawData(rawTeleDate)
   
-  return config
+  return [autoData, teleData]
 }
+function parseRawData(data) {
+  var out = []
+  for(var i = 0; i < data.length; i++) {
+    var type = getTypeID(data[i][0])
+    if(type == -1) { break; }
+    
+    // Difrent gen for dif types
+    if(type == 3) {
+      var options = data[i][3].split(",")
+      out.push([type, data[i][1], data[i][2], options])
+    } else if (type == 2) {
+      out.push([type, data[i][1], data[i][2], data[i][3]])
+    } else {
+      out.push([type, data[i][1], data[i][2]])
+    }
+  }
+  
+  return out
+}
+function getTypeID(string) {
+  string = string.toLowerCase()
+  
+  if(string == "plus/minus") {
+    return 0;
+  } else if(string == "checkbox") {
+    return 1;
+  } else if(string == "slider") {
+    return 2;
+  } else if(string == "dropdown") {
+    return 3;
+  } else if(string == "text") {
+    return 4;
+  }
+  return -1;
+}
+
+
+
+
+
+
+
 

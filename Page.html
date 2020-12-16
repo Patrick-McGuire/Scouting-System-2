@@ -15,13 +15,13 @@
        <br>
        <label for="position">Scouting Position:</label>
        <select name="position" id="position">
-         <option value="nonePos">None</option>
-         <option value="blue1">Blue 1</option>
-         <option value="blue2">Blue 2</option>
-         <option value="blue3">Blue 3</option>
-         <option value="red1">Red 1</option>
-         <option value="red2">Red 2</option>
-         <option value="red3">Red 3</option>
+         <option value="0">None</option>
+         <option value="1">Blue 1</option>
+         <option value="2">Blue 2</option>
+         <option value="3">Blue 3</option>
+         <option value="4">Red 1</option>
+         <option value="5">Red 2</option>
+         <option value="6">Red 3</option>
        </select>
        <p></p>
        <label>Match Number: </label><input type="text" id="matchNumber" class="smallInput">
@@ -32,6 +32,9 @@
        
        <br><hr><br><h3>Tele</h3><br>
        <div id="teleContent"></div>
+       <br><hr><br>
+       <button type="button" class="submitButton" id="onlineSubmit" onclick="submit()">Submit</button>
+       <button type="button" class="submitButton" id="offlineSubmit" onclick="exportToSheets()">Submit Stored Data</button>
      </div>
      
      

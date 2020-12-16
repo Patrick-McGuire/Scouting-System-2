@@ -1,7 +1,99 @@
 <script>
   // Runs a function in WebApp.gs
   google.script.run.withSuccessHandler(generateDataEntry).getConfigData();
+  google.script.run.withSuccessHandler(setMatchSchedule).getMatchSchedule();
+  setInterval(online, 10000);
+  document.getElementById("offlineSubmit").style.background='#DB4437'
+  
+  ////////// Functions to handle the subition of data //////////
+  function submit() {
+    //// Get the data from the sheet ////
+    var keys = sessionStorage.getItem("scoutingKeys").split(",")
+    var json = {}
+    
+    json["match"] = document.getElementById("matchNumber").value
+    json["team"] = document.getElementById("teamNumber").value
+    for(var i = 0; i < keys.length; i++) {
+      if(keys[i] == "") { break }
+      if(document.getElementById(keys[i]).className == "checkbox") {
+        json[keys[i]] = document.getElementById(keys[i]).checked
+        document.getElementById(keys[i]).checked = false
+      } else {
+        json[keys[i]] = document.getElementById(keys[i]).value
+        document.getElementById(keys[i]).value = 0
+      }
+    }
+    var matchData = JSON.stringify(json)
 
+    //// Add the data to the stored data ////
+    var matches = []
+    if(localStorage.getItem("frcScoutingData") != null) {
+      matches = localStorage.getItem("frcScoutingData").split("<>")
+    }
+    matches.push(matchData)
+    localStorage.setItem("frcScoutingData", matches.join("<>"))
+    
+    //// Try and send the data to the sheet ////
+    exportToSheets()
+  }
+  function exportToSheets() {
+    if(online()) {
+      google.script.run.submitData(localStorage.getItem("frcScoutingData").split("<>"))
+      localStorage.setItem("frcScoutingData", null)
+    }
+  }
+// Check if we are online and update the color of the sublit stored data button
+  function online() {
+    var online = navigator.onLine;
+    if(online) {
+      document.getElementById("offlineSubmit").style.background='#0F9D58'
+    } else {
+      document.getElementById("offlineSubmit").style.background='#DB4437'
+    }
+    return online
+  }
+  
+  ////////// Functions for handing match schedue data and display //////////
+  document.getElementById('matchNumber').addEventListener('input', matchChangeEvent);
+  document.getElementById('position').addEventListener('input', positionChangeEvent);
+  // Update the match number and team numer when a position is selectd
+  function positionChangeEvent() {
+    var pos = document.getElementById('position').value;
+    if(pos == "0") { return }
+    var matchStr = document.getElementById('matchNumber').value;
+    var add = parseInt(pos, 10)
+    var matchNum = 1
+    if(matchStr != "") {
+      matchNum = parseInt(matchStr, 10)
+      matchNum = Math.max(matchNum, 1)
+      matchNum = Math.min(matchNum, 300)
+    }
+    var teamIndex = ((matchNum * 6) - 7 + add)
+    var matches = sessionStorage.getItem("matchSched").split(",")
+    var team = matches[teamIndex]
+    document.getElementById('teamNumber').value = team;
+    document.getElementById('matchNumber').value = matchNum;
+  }
+  // Update teamnumber when match number is changed
+  function matchChangeEvent() {
+    var pos = document.getElementById('position').value;
+    if(pos == "0") { return }
+    var matchStr = document.getElementById('matchNumber').value;
+    var add = parseInt(pos, 10)
+    var matchNum = 1
+      matchNum = parseInt(matchStr, 10)
+    var teamIndex = ((matchNum * 6) - 7 + add)
+    var matches = sessionStorage.getItem("matchSched").split(",")
+    var team = matches[teamIndex]
+    document.getElementById('teamNumber').value = team;
+  }
+  function setMatchSchedule(schedule) { 
+    sessionStorage.setItem("matchSched", schedule) 
+  }
+
+  
+  
+  
   ////////// Generate the data entry page //////////
   // Get the html needed based on the spreadsheet, and inset it into the webpage
   function generateDataEntry(data) {
@@ -13,8 +105,21 @@
     var teleSection = document.getElementById("teleContent");
     autoSection.innerHTML = autoHTML;
     teleSection.innerHTML = teleHTML;
+    
+    // Save a refrence dataset for future use
+    sessionStorage.setItem("scoutingKeys", data[2])
+    
+    var keys = sessionStorage.getItem("scoutingKeys").split(",")
+    for(var i = 0; i < keys.length; i++) {
+      if(keys[i] == "") { break }
+      if(document.getElementById(keys[i]).className == "checkbox") {
+        document.getElementById(keys[i]).checked = false
+      } else {
+        document.getElementById(keys[i]).value = 0
+      }
+    }
   }
-  // Parse the datastructre and generate the html
+  // Parse the datastructre(see WebApp.gs for the format of the sturcture) and generate the html
   function generateHTML(data) {
     var html = ""
     for(var i = 0; i < data.length; i++) {
@@ -37,6 +142,7 @@
   ////////// HTML Generation //////////
   // Gets the html needed for a plus minus
   function getPlusMinusHTML(name, id) {
+    name += ": "
     var apost = "'"
     var line1 = "<p>" + name + '</p><button type="button" onclick="minus(' + apost + id + apost + ')" class="plusMinusButon">-</button>'
     var line2 = '<input type="text" id="' + id + '" value="0" class="plusMinusInput">'
@@ -45,14 +151,17 @@
   }
   // Gets the html needed for a check box
   function getCheckBoxHTML(name, id) {
-    return '<br><label>' + name + '</label> <input type="checkbox" id="' + id + '"><br>'
+    name += ": "
+    return '<br><label>' + name + '</label> <input class="checkbox" type="checkbox" id="' + id + '"><br>'
   }
   // Gets the html for a text box
   function getTextBoxHTML(name, id) {
+    name += ": "
     return '<p>' + name + '</p><textarea id="' + id + '" class="commentInput"></textarea><br>'
   }
   // Gets the html for a slider
   function getSliderHTML(name, id, max) {
+    name += ": "
     var id2 = id + "thisisunique"
     var apost = "'"
     var line1 = '<br><label>' + name + '</label><input type="range" min="1" max="' + max + '" value="0" class="sliderRange" onchange="sliderDrag(' + apost + id2 + apost + "," + apost + id + apost + ')" id="' + id2 + '">'
@@ -61,10 +170,11 @@
   }
   // Gets the html for a dropdown
   function getDropDownHTML(name, id, options) {
+    name += ": "
     var html = '<br><label>' + name + '</label><select name="position" id="' + id + '">'
     // Add all the lines, note that the value of the select will be the indedx of the name in the options data
     for(var i = 0; i < options.length; i++) {
-      html = html + '<option value="' + i.toString() + '">' + options[i] + '</option>'
+      html = html + '<option value="' + options[i] + '">' + options[i] + '</option>'
     }
     return html + '</select><br>'
   }

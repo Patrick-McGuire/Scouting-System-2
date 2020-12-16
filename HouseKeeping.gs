@@ -1,6 +1,19 @@
 ///////////// Basic house keeping stuff /////////////
 // Sheet names
 var webpageConfig = 'Webpage Config'
+var matchSchedule = 'Match Schedule';
+
+// Create the menue when ever the spreadsheet is opened
+function onOpen(e) {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var ui = SpreadsheetApp.getUi();
+  ui.createMenu('TBA Import')
+  .addItem('Match Times', 'getTimes')
+  .addItem('Import Match Schedule', 'importSchedule')
+  .addItem('Test', 'testNOTHINGATACHEDHERE')
+  .addToUi();
+}
+
 
 // Clears the match schedule, teams list, and team's matches data
 function ClearData(spreadsheet) {

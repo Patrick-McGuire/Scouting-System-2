@@ -5,6 +5,23 @@ function doGet(e) {
      return pageData;
 }
 
+
+function submitData(data) {
+//  ui.alert(data)
+  var sheet = SpreadsheetApp.getActiveSpreadsheet()
+  for(var i = 1; i <= data.length; i++) {
+    setValue(sheet, "Data", "A" + i, data[i])
+  }
+}
+
+
+function getMatchSchedule() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet()
+  var ms = getValues(sheet, matchSchedule, "U4", "Z152");
+  return ms
+}
+
+
 // Returns the data needed to make the webpage. Called from the web app
 // Datastrucure format:
 //[auto, tele]
@@ -19,10 +36,11 @@ function getConfigData() {
   // Get the data from the sheet
   var rawAutoData = getValues(spreadsheet, webpageConfig, 'B10', 'E60')
   var rawTeleDate = getValues(spreadsheet, webpageConfig, 'G10', 'J60')
+  var keyData = getValues(spreadsheet, webpageConfig, 'F8', 'F60')
   // Convert the data to the above format
   var autoData = parseRawData(rawAutoData)
   var teleData = parseRawData(rawTeleDate)
-  return [autoData, teleData]
+  return [autoData, teleData, keyData]
 }
 
 // Turn data from the sheet into data that the webapp can understand

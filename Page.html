@@ -8,10 +8,10 @@
      <button class="tablink" onclick="openPage('Tab1', this, '#666')" id="defaultOpen">Scouting Entry</button>
      <button class="tablink" onclick="openPage('Tab2', this, '#666')">Match Scheule</button>
      <button class="tablink" onclick="openPage('Tab3', this, '#666')">Robot Tinder</button>
-     <button class="tablink" onclick="openPage('Tab4', this, '#666')">Google Sheets</button>
+     <button class="tablink" onclick="openPage('Tab4', this, '#666')">Not Used</button>
      
      <div id="Tab1" class="tabcontent">
-       <h2>Scouting Entry Form</h3>
+       <h2>Scouting Entry Form</h2>
        <br>
        <label for="position">Scouting Position:</label>
        <select name="position" id="position">
@@ -26,64 +26,11 @@
        <p></p>
        <label>Match Number: </label><input type="text" id="matchNumber" class="smallInput">
        <label>Team Number: </label><input type="text" id="teamNumber" class="smallInput">
+       
        <br><br><h3>Auto</h3><br>
-       
-       <p>Data 1:</p>
-       <button type="button" onclick="plus('data1')" class="plusMinusButon">+</button>
-       <input type="text" id="data1" value="0" class="plusMinusInput">
-       <button type="button" onclick="minus('data1')" class="plusMinusButon">-</button>
-       <br>
-       
-       <p>Data 2:</p>
-       <button type="button" onclick="plus('data2')" class="plusMinusButon">+</button>
-       <input type="text" id="data2" value="0" class="plusMinusInput">
-       <button type="button" onclick="minus('data2')" class="plusMinusButon">-</button>
-       <br>
-       
-       <br>
-       <label>Data 4: </label> <input type="checkbox" id="data4">
-       <br>
-       
-       <br>
-       <label>Data 5: </label> <input type="checkbox" id="data5">
-       <br>
-       
-       <p>Data 6:</p>
-       <textarea id="data6" class="commentInput"></textarea>
-       <br>
-       
-       <p>Data 7:</p>
-       <textarea id="data7" class="commentInput"></textarea>
-       <br>
-       
-       <br>
-       <label>Data 8: </label><input type="range" min="1" max="100" value="0" class="sliderRange" onchange="sliderDrag('8data', 'data8')" id="8data">
-       <input type="text" id="data8" value="0" onchange="sliderDrag('data8', '8data')" class="sliderText">
-       <br>
-       
-       <br>
-       <label>Data 9: </label><input type="range" min="1" max="100" value="0" class="sliderRange" onchange="sliderDrag('9data', 'data9')" id="9data">
-       <input type="text" id="data9" value="0" onchange="sliderDrag('data9', '9data')" class="sliderText">
-       <br>
-       
-       <br>
-       <label>Data 10: </label>
-       <select name="position" id="data10">
-         <option value="none">None</option>
-         <option value="OPT1">Option 1</option>
-         <option value="OPT2">Option 2</option>
-       </select>
-       <br>
-       
-       <br>
-       <label>Data 11: </label>
-       <select name="position" id="data11">
-         <option value="none">None</option>
-         <option value="OPT1">Option 1</option>
-         <option value="OPT2">Option 2</option>
-       </select>
-       <br>
-       
+       <div id="autoContent"></div>
+       <br><h3>Tele</h3><br>
+       <div id="teleContent"></div>
      </div>
      
      
@@ -101,7 +48,8 @@
        <h3>About</h3>
        <p>Who we are and what we do.</p>
      </div>
-     <!-- This adds the Javascrp -->
-     <?!= HtmlService.createHtmlOutputFromFile('Javascript').getContent(); ?> 
+     
+     <!--Get the scripts and run the generation of the page-->
+     <?!= HtmlService.createHtmlOutputFromFile('Javascript').getContent(); ?>
   </body>
 </html>

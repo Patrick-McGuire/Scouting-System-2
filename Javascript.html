@@ -1,4 +1,75 @@
 <script>
+  // Runs a function in WebApp.gs
+  google.script.run.withSuccessHandler(generateDataEntry).getConfigData();
+
+  ////////// Generate the data entry page //////////
+  // Get the html needed based on the spreadsheet, and inset it into the webpage
+  function generateDataEntry(data) {
+    var autoData = data[0]
+    var teleData = data[1]
+    var autoHTML = generateHTML(autoData)
+    var teleHTML = generateHTML(teleData)
+    var autoSection = document.getElementById("autoContent");
+    var teleSection = document.getElementById("teleContent");
+    autoSection.innerHTML = autoHTML;
+    teleSection.innerHTML = teleHTML;
+  }
+  // Parse the datastructre and generate the html
+  function generateHTML(data) {
+    var html = ""
+    for(var i = 0; i < data.length; i++) {
+      if(data[i][0] == 0) {
+        html += getPlusMinusHTML(data[i][1], data[i][2])
+      } else if(data[i][0] == 1) {
+        html += getCheckBoxHTML(data[i][1], data[i][2])
+      } else if(data[i][0] == 2) {
+        html += getSliderHTML(data[i][1], data[i][2], data[i][3])
+      } else if(data[i][0] == 3) {
+        html += getDropDownHTML(data[i][1], data[i][2], data[i][3])
+      } else if(data[i][0] == 4) {
+        html += getTextBoxHTML(data[i][1], data[i][2])
+      }
+    }
+    return html
+  }
+
+  
+  ////////// HTML Generation //////////
+  // Gets the html needed for a plus minus
+  function getPlusMinusHTML(name, id) {
+    var apost = "'"
+    var line1 = "<p>" + name + '</p><button type="button" onclick="plus(' + apost + id + apost + ')" class="plusMinusButon">+</button>'
+    var line2 = '<input type="text" id="' + id + '" value="0" class="plusMinusInput">'
+    var line3 = '<button type="button" onclick="minus(' + apost + id + apost + ')" class="plusMinusButon">-</button><br>'
+    return line1 + line2 + line3;
+  }
+  // Gets the html needed for a check box
+  function getCheckBoxHTML(name, id) {
+    return '<br><label>' + name + '</label> <input type="checkbox" id="' + id + '"><br>'
+  }
+  // Gets the html for a text box
+  function getTextBoxHTML(name, id) {
+    return '<p>' + name + '</p><textarea id="' + id + '" class="commentInput"></textarea><br>'
+  }
+  // Gets the html for a slider
+  function getSliderHTML(name, id, max) {
+    var id2 = id + "thisisunique"
+    var apost = "'"
+    var line1 = '<br><label>' + name + '</label><input type="range" min="1" max="' + max + '" value="0" class="sliderRange" onchange="sliderDrag(' + apost + id2 + apost + "," + apost + id + apost + ')" id="' + id2 + '">'
+    var line2 = '<input type="text" id="' + id + '" value="0" onchange="sliderDrag(' + apost + id + apost + "," + apost + id2 + apost + ')" class="sliderText"><br>'
+    return line1 + line2
+  }
+  // Gets the html for a dropdown
+  function getDropDownHTML(name, id, options) {
+    var html = '<br><label>' + name + '</label><select name="position" id="' + id + '">'
+    // Add all the lines, note that the value of the select will be the indedx of the name in the options data
+    for(var i = 0; i < options.length; i++) {
+      html = html + '<option value="' + i.toString() + '">' + options[i] + '</option>'
+    }
+    return html + '</select><br>'
+  }
+  
+  ////////// Widget mechnics //////////
   function plus(id) {
     var value = parseInt(document.getElementById(id).value, 10);
     value = isNaN(value) ? 0 : value;
@@ -19,6 +90,7 @@
   }
   
   
+  ////////// Tabs //////////
   function openPage(pageName, elmnt, color) {
     // Hide all elements with class="tabcontent" by default
     var i, tabcontent, tablinks;

@@ -4,6 +4,8 @@
   google.script.run.withSuccessHandler(setMatchSchedule).getMatchSchedule();
   setInterval(online, 10000);
   document.getElementById("offlineSubmit").style.background='#DB4437'
+  document.getElementById("offlineSubmit").innerHTML = "Submit Stored Data (" + localStorage.getItem("frcScoutingDataStored") + ")"
+  online()
   
   ////////// Functions to handle the subition of data //////////
   function submit() {
@@ -32,14 +34,17 @@
     }
     matches.push(matchData)
     localStorage.setItem("frcScoutingData", matches.join("<>"))
-    
+    localStorage.setItem("frcScoutingDataStored", parseInt(localStorage.getItem("frcScoutingDataStored"), 10) + 1)
     //// Try and send the data to the sheet ////
+    document.getElementById("offlineSubmit").innerHTML = "Submit Stored Data (" + localStorage.getItem("frcScoutingDataStored") + ")"
     exportToSheets()
   }
   function exportToSheets() {
     if(online()) {
       google.script.run.submitData(localStorage.getItem("frcScoutingData").split("<>"))
       localStorage.setItem("frcScoutingData", null)
+      localStorage.setItem("frcScoutingDataStored", "0")
+      document.getElementById("offlineSubmit").innerHTML = "Submit Stored Data (" + localStorage.getItem("frcScoutingDataStored") + ")"
     }
   }
 // Check if we are online and update the color of the sublit stored data button
@@ -89,10 +94,28 @@
   }
   function setMatchSchedule(schedule) { 
     sessionStorage.setItem("matchSched", schedule) 
+    generateMatchSchedule()
   }
-
-  
-  
+  function generateMatchSchedule() {
+    var html = '<table class="table"><tr class="table"><td class="table">Match Number</td><td class="table">Red 1</td><td class="table">Red 2</td><td class="table">Red 3</td><td class="table">Blue 1</td><td class="table">Blue 2</td><td class="table">Blue 3</td></tr>'
+    var matchSchedule = sessionStorage.getItem("matchSched").split(",")
+    var count = 0
+    for(var i = 0; true; i++) {
+      html += '<tr class="table">'
+      if(matchSchedule[count] == "") { break }
+      for(var j = 0; j < 7; j++) {
+        if(j == 0) {
+          html += '<td class="table">' + (i + 1) + '</td>'
+        } else {
+          html += '<td class="table">' + matchSchedule[count] + '</td>'
+          count++
+        }
+      }
+      html += '</tr>'
+    }
+    html += '</table>'
+    document.getElementById("matchSchedContent").innerHTML = html
+  }
   
   ////////// Generate the data entry page //////////
   // Get the html needed based on the spreadsheet, and inset it into the webpage

@@ -1,7 +1,8 @@
 ///////////// Basic house keeping stuff /////////////
 // Sheet names
-var webpageConfig = 'Webpage Config'
+var webpageConfig = 'Webpage Config';
 var matchSchedule = 'Match Schedule';
+var logs = 'Logs'
 
 // Create the menue when ever the spreadsheet is opened
 function onOpen(e) {

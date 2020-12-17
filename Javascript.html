@@ -2,13 +2,17 @@
   // Runs a function in WebApp.gs
   google.script.run.withSuccessHandler(generateDataEntry).getConfigData();
   google.script.run.withSuccessHandler(setMatchSchedule).getMatchSchedule();
-  setInterval(online, 10000);
+  setInterval(online, 2000);
   document.getElementById("offlineSubmit").style.background='#DB4437'
-  document.getElementById("offlineSubmit").innerHTML = "Submit Stored Data (" + localStorage.getItem("frcScoutingDataStored") + ")"
+  document.getElementById("offlineSubmit").innerHTML = "Submit Stored Data (" + (parseInt(localStorage.getItem("frcScoutingDataStored"), 10) || 0) + ")"
   online()
   
   ////////// Functions to handle the subition of data //////////
   function submit() {
+    if(document.getElementById("matchNumber").value == "" || document.getElementById("teamNumber").value == "") { 
+      alert("no team number or match number")
+      return 
+    }
     //// Get the data from the sheet ////
     var keys = sessionStorage.getItem("scoutingKeys").split(",")
     var json = {}
@@ -36,15 +40,18 @@
     localStorage.setItem("frcScoutingData", matches.join("<>"))
     localStorage.setItem("frcScoutingDataStored", parseInt(localStorage.getItem("frcScoutingDataStored"), 10) + 1)
     //// Try and send the data to the sheet ////
-    document.getElementById("offlineSubmit").innerHTML = "Submit Stored Data (" + localStorage.getItem("frcScoutingDataStored") + ")"
+    document.getElementById("offlineSubmit").innerHTML = "Submit Stored Data (" + (parseInt(localStorage.getItem("frcScoutingDataStored"), 10) || 0) + ")"
     exportToSheets()
+    document.getElementById("matchNumber").value = parseInt(document.getElementById("matchNumber").value, 10) + 1
+    matchChangeEvent()
+    window.scrollTo(0, 0); // values are x,y-offset
   }
   function exportToSheets() {
     if(online()) {
       google.script.run.submitData(localStorage.getItem("frcScoutingData").split("<>"))
       localStorage.setItem("frcScoutingData", null)
       localStorage.setItem("frcScoutingDataStored", "0")
-      document.getElementById("offlineSubmit").innerHTML = "Submit Stored Data (" + localStorage.getItem("frcScoutingDataStored") + ")"
+      document.getElementById("offlineSubmit").innerHTML = "Submit Stored Data (" + (parseInt(localStorage.getItem("frcScoutingDataStored"), 10) || 0) + ")"
     }
   }
 // Check if we are online and update the color of the sublit stored data button
@@ -221,6 +228,7 @@
     value--;
     document.getElementById(id2).value = value;
   }
+  
   
   
   ////////// Tabs //////////

@@ -7,11 +7,16 @@ function doGet(e) {
 
 
 function submitData(data) {
-//  ui.alert(data)
   var sheet = SpreadsheetApp.getActiveSpreadsheet()
-  for(var i = 1; i <= data.length; i++) {
-    setValue(sheet, "Data", "A" + i, data[i])
-  }
+  
+  var time = new Date().toLocaleTimeString();
+  var date = new Date();
+  // Get the number of logs in the log sheet, so we don't overwrite any logs
+  var logCount = getValue(sheet, logs, 'E3');
+  var endRow = logCount + 2;
+  for(var i = 1; i < data.length; i++) {
+    setValues(sheet, logs, 'B' + (endRow + i), 'D' + (endRow + i), [[data[i], time, date]]);
+  }  
 }
 
 
